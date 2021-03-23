@@ -49,15 +49,13 @@ def getDatos(pageCont):
     #en dd se encuentran los datos de cada pieza y en dt el nombre de la variable
     for elemento in tags:
         if elemento.name == "dd": # Contenido
+            cadena = []
             for x in elemento.stripped_strings:
-                elementos.append(x)
+                cadena.append(x)
+            elementos.append("".join(cadena))
         else:
             for z in elemento.stripped_strings: # Etiqueta
-                if z == "Dimensión":
-                    continue
-                else:
-                    elementos.append(z)
-                print(z)
+                elementos.append(z)
     return elementos
 
 
@@ -107,7 +105,21 @@ enlacesObras = getLinks(pagBaseStr)
 datos = []
 datos.append(getDatos(getPage(enlacesObras[0])))
 
-print(datos)
+#TODO Subir los paquetes, convertir este flujo en un loop
+import numpy as np
+import pandas as pd
+
+datosNP = []
+datosNP.append(np.array(datos[0]))
+
+datosNP = np.array(datos[0])
+datosDF = np.reshape(datosNP, (9, 2))
+contenido = datosDF[:,1]
+print(contenido)
+datosDF = pd.DataFrame(data=[contenido], columns=datosDF[:,0])
+print(datosDF)
+#datosDF.to_csv('mydataframe.csv', index=False, encoding="iso-8859-1")
+
 """
 #obtenemos todos los links a buscar
 linksBuscar = getLinks(webBase)
