@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+import numpy as np
+import pandas as pd
 
 webBase = "https://www.museodelprado.es/coleccion/obras-de-arte"
 
@@ -103,23 +105,29 @@ enlacesObras = getLinks(pagBaseStr)
 
 # Extraemos los datos
 datos = []
-datos.append(getDatos(getPage(enlacesObras[0])))
+for link in enlacesObras:
+    tempPage = getPage(link)
+    tempData = getDatos(tempPage)
+    datos.append(tempData)
 
-#TODO Subir los paquetes, convertir este flujo en un loop
-import numpy as np
-import pandas as pd
+datosNP = np.array(datos)
 
-datosNP = []
-datosNP.append(np.array(datos[0]))
-
-datosNP = np.array(datos[0])
-datosDF = np.reshape(datosNP, (9, 2))
-contenido = datosDF[:,1]
-print(contenido)
-datosDF = pd.DataFrame(data=[contenido], columns=datosDF[:,0])
+for i, _array in enumerate(datosNP):
+    if i == 0: # Sólo se va a ejecutar en la primera iteración luego iniciamos el df
+        tempData = np.reshape(datosNP[i], (9, 2)) # Lista de listas
+        fichaTec = tempData[:, 1] # Extrae la info
+        datosDF = pd.DataFrame(data=[fichaTec], columns=tempData[:, 0])
+    else:
+        tempData = np.reshape(datosNP[i], (9, 2))
+        fichaTec = []
+        for element in tempData:
+            fichaTec.append(element[1])
+        datosDF.loc[len(datosDF.index)] = fichaTec
 print(datosDF)
-#datosDF.to_csv('mydataframe.csv', index=False, encoding="iso-8859-1")
+datosDF.to_csv('mydataframe.csv', index=False, encoding="iso-8859-1") #TODO al exportar el ; corta la línea
 
+
+#TODO hacer una lista con todos los links de descarga e incluirlos en una nueva columna "url" en el df
 """
 #obtenemos todos los links a buscar
 linksBuscar = getLinks(webBase)
