@@ -32,7 +32,7 @@ def getDatos(srcUrl):
             cadena = []
             for x in i.stripped_strings:
                 cadena.append(x)
-            elementos.append(cadena)
+            elementos.append("".join(cadena))
         else:
             for z in i.stripped_strings:       
                 elementos.append(z)
