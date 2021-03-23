@@ -5,7 +5,7 @@ princ = "https://www.museodelprado.es/coleccion/obras-de-arte"
 
 def getLinks(srcUrl):
     page = requests.get(srcUrl)
-    soup = BeautifulSoup(page.content)
+    soup = BeautifulSoup(page.content, features="html.parser")
 
     mosaico =  soup.find_all(class_="presentacion-mosaico")
     links = []
@@ -19,7 +19,7 @@ def getLinks(srcUrl):
 def getDatos(srcUrl):
     #descargamos el html y lo parseamos con BS
     page = requests.get(srcUrl)
-    soup = BeautifulSoup(page.content)
+    soup = BeautifulSoup(page.content, features="html.parser")
 
     #buscamos la clase ficha-tecnica que contiene todos los datos
     ficha =  soup.find(class_="ficha-tecnica")
@@ -55,7 +55,7 @@ def load_requests(source_url):
 
 def getImage(srcUrl):
     page = requests.get(srcUrl)
-    soup = BeautifulSoup(page.content)
+    soup = BeautifulSoup(page.content, features="html.parser")
     #buscamos la clase section-viewer que contiene el src de la imagen
     images = []
     imagen =  soup.find(class_="section-viewer")
