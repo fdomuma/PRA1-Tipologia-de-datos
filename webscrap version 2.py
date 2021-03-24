@@ -85,23 +85,28 @@ def getDatos(pageCont):
     """
     #TODO Arreglar la estructura en la que extrae la información
     ficha =  pageCont.find(class_="ficha-tecnica")
-    tags = ficha.find_all(['dt', 'dd'])
-    elementos = []
+    if ficha is not None:
+        tags = ficha.find_all(['dt', 'dd'])
+        elementos = []
 
-    #en dd se encuentran los datos de cada pieza y en dt el nombre de la variable
-    for elemento in tags:
-        if elemento.name == "dd": # Contenido
-            cadena = []
-            for x in elemento.stripped_strings:
-                cadena.append(x)
-            elementos.append("".join(cadena))
-        else:
-            for z in elemento.stripped_strings: # Etiqueta
-                elementos.append(z)
-    #añadimos las columnas pendientes, columna de Url y obteemos el link
-    elementos = insertNone(elementos)
-    elementos.append("UrlImagen")        
-    elementos.append(getLinkImage(pageCont))     
+        #en dd se encuentran los datos de cada pieza y en dt el nombre de la variable
+        for elemento in tags:
+            if elemento.name == "dd": # Contenido
+                cadena = []
+                for x in elemento.stripped_strings:
+                    cadena.append(x)
+                elementos.append("".join(cadena))
+            else:
+                for z in elemento.stripped_strings: # Etiqueta
+                    elementos.append(z)
+        #añadimos las columnas pendientes, columna de Url y obteemos el link
+        if len(elementos) < 18:
+            elementos = insertNone(elementos)
+        elementos.append("UrlImagen")        
+        elementos.append(getLinkImage(pageCont))
+    else:
+        elementos = ["Número de catálogo","","Autor","","Título","","Fecha","",
+                    "Técnica","","Soporte","","Dimensión","","Serie","","Procedencia","","UrlImagen",""]       
     return elementos
 
 
@@ -152,11 +157,13 @@ driver = webdriver.Chrome(ChromeDriverManager().install(), options = option)
 
 webBase = "https://www.museodelprado.es/coleccion/obras-de-arte"
 driver.get(webBase)
-
-driver.find_element_by_tag_name('body').send_keys(Keys.END) # Función que permite llegar al final de la pagina web
-print("Fin pagina")
-time.sleep(10)
-print("Fin time")
+try:
+    driver.find_element_by_tag_name('body').send_keys(Keys.END) # Función que permite llegar al final de la pagina web
+    print("Fin pagina")
+    time.sleep(120) #necesitamos 2000 segundos hasta que la pagina llega al final
+    print("Fin time")
+except:
+    print("error") 
 
 #obtenemos el archivo html para beautifulsoup
 body = driver.execute_script("return document.body")
@@ -166,21 +173,25 @@ source = body.get_attribute('innerHTML')
 pagBaseStr = BeautifulSoup(source, "html.parser")
 
 # Extraemos los links
-numMax = 200
-enlacesObras = getLinksMax(pagBaseStr,numMax)
+
+enlacesObras = getLinks(pagBaseStr)
+numMax = len(enlacesObras)
+#enlacesObras = getLinksMax(pagBaseStr,numMax)
 driver.close()
 
 # Extraemos los datos
 datos = []
 inicio = 1
+
 for link in enlacesObras:
     print(inicio,"/",numMax)
     tempPage = getPage(link)    
     tempData = getDatos(tempPage)
+    if len(tempData)!= 20:
+        print(tempData)
     datos.append(tempData)
     inicio += 1
-
-
+    time.sleep(0.5)
 
 
 datosNP = np.array(datos)
@@ -201,6 +212,4 @@ datosDF.to_csv('mydataframe.csv', index=False, encoding="utf-8") #TODO al export
 
 
 #TODO hacer una lista con todos los links de descarga e incluirlos en una nueva columna "url" en el df
-
-
 
