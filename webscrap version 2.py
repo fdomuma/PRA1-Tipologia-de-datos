@@ -160,7 +160,7 @@ driver.get(webBase)
 try:
     driver.find_element_by_tag_name('body').send_keys(Keys.END) # Función que permite llegar al final de la pagina web
     print("Fin pagina")
-    time.sleep(120) #necesitamos 2000 segundos hasta que la pagina llega al final
+    time.sleep(600) #necesitamos 2000 segundos hasta que la pagina llega al final
     print("Fin time")
 except:
     print("error") 
@@ -171,27 +171,31 @@ source = body.get_attribute('innerHTML')
 
 # Extraemos la estructura de la página base
 pagBaseStr = BeautifulSoup(source, "html.parser")
-
+driver.close()
 # Extraemos los links
 
 enlacesObras = getLinks(pagBaseStr)
 numMax = len(enlacesObras)
 #enlacesObras = getLinksMax(pagBaseStr,numMax)
-driver.close()
+
 
 # Extraemos los datos
 datos = []
 inicio = 1
 
 for link in enlacesObras:
-    print(inicio,"/",numMax)
-    tempPage = getPage(link)    
-    tempData = getDatos(tempPage)
-    if len(tempData)!= 20:
-        print(tempData)
-    datos.append(tempData)
-    inicio += 1
-    time.sleep(0.5)
+    try:
+        print(inicio,"/",numMax)
+        tempPage = getPage(link)    
+        tempData = getDatos(tempPage)
+        if len(tempData)!= 20:
+            print(tempData)
+        datos.append(tempData)
+        inicio += 1
+        time.sleep(0.5)
+    except Exception as e:
+        print(str(e))
+        pass
 
 
 datosNP = np.array(datos)
