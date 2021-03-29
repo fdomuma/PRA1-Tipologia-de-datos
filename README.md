@@ -4,9 +4,7 @@
 
 Este trabajo ha sido realizado por **Fernando Muñoz Martín** y **Ricardo Santos Patrício**, alumnos de la asignatura **Tipología y ciclo de vida de los datos** del **Máster en Ciencia de Datos**.
 
-## Descripción
-
-## Archivos
+## Descripción Archivos
 
 En este repositorio podemos encontrar las siguientes carpetas y archivos:
 
