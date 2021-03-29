@@ -9,10 +9,12 @@ from selenium.common.exceptions import ElementClickInterceptedException
 import time
 from selenium.webdriver.common.keys import Keys
 
+#-------------------------------------------------------------------------------
+# Funciones para la obtención de datos
 
 def insertNone(datos):
     """
-    Función para tratar los datos nulos de cada obra
+    Función que trata los datos nulos de cada obra
 
     :param datos: lista con los datos actuales de la obra
     :return: lista con todas las variables 
@@ -22,9 +24,10 @@ def insertNone(datos):
     for col in columnas:
         if col not in datos:
             indice = columnas.index(col)*2
-            datos.insert(indice,col)
-            datos.insert(indice + 1,"None")
+            datos.insert(indice, col)
+            datos.insert(indice + 1, "None")
     return datos        
+
 
 def getPage(srcUrl):
     """
@@ -38,6 +41,7 @@ def getPage(srcUrl):
     pageCont = BeautifulSoup(pageStr.content, features="html.parser")
 
     return pageCont
+
 
 def getLinks(pageCont):
     """
@@ -55,6 +59,7 @@ def getLinks(pageCont):
         links.append(prueba.get("href"))
 
     return links
+
 
 def getLinksMax(pageCont,max):
     """
@@ -80,16 +85,15 @@ def getDatos(pageCont):
     """
     Extrae los datos incluidos en la ficha técnica
 
-    :param pageCont: Estructura HTML de una web   14/15
+    :param pageCont: Estructura HTML de una web
     :return: Lista con el contenido de la ficha técnica
     """
-    #TODO Arreglar la estructura en la que extrae la información
-    ficha =  pageCont.find(class_="ficha-tecnica")
+
+    ficha = pageCont.find(class_="ficha-tecnica")
     if ficha is not None:
-        tags = ficha.find_all(['dt', 'dd'])
+        tags = ficha.find_all(['dt', 'dd']) # En dd están los datos de cada pieza y en dt el nombre de la variable
         elementos = []
 
-        #en dd se encuentran los datos de cada pieza y en dt el nombre de la variable
         for elemento in tags:
             if elemento.name == "dd": # Contenido
                 cadena = []
@@ -99,7 +103,7 @@ def getDatos(pageCont):
             else:
                 for z in elemento.stripped_strings: # Etiqueta
                     elementos.append(z)
-        #añadimos las columnas pendientes, columna de Url y obteemos el link
+        # Añadido de las columnas pendientes, columna de Url y obtención del link
         if len(elementos) < 18:
             elementos = insertNone(elementos)
         elementos.append("UrlImagen")        
@@ -109,14 +113,15 @@ def getDatos(pageCont):
                     "Técnica","","Soporte","","Dimensión","","Serie","","Procedencia","","UrlImagen",""]       
     return elementos
 
+#-------------------------------------------------------------------------------
+# Funciones para la descarga de imágenes
 
-#función para descargar imagen
 def load_requests(source_url):
     """
     Descarga imagen contenida en source_url
-    #TODO
+
     :param source_url:
-    :return:
+    :return: None
     """
 
     r = requests.get(source_url, stream = True)
@@ -125,6 +130,7 @@ def load_requests(source_url):
         ruta = "./img/"+aSplit[len(aSplit)-1]
         print(ruta)
         output = open(ruta,"wb")
+
         for chunk in r:
             output.write(chunk)
         output.close()
@@ -132,27 +138,27 @@ def load_requests(source_url):
 
 def getLinkImage(pageCont):
     """
-    Extrae el link de imagende la obra contenida en pageCont
+    Extrae el link de la imagen de una obra contenida en pageCont
     :param pageCont:
     :return: Link de la imagen de la obra
     """
+
     linksImagen = []
     imagenInfo = pageCont.find(class_="section-viewer")
-    #obtenemos todos los img-src
-    for img in imagenInfo.findAll('img'):
+
+    for img in imagenInfo.findAll('img'): # Obtención de todos los img-src
         linksImagen.append(img.get('src'))
 
     return  list(filter(None, linksImagen))[0]
 
 #-------------------------------------------------------------------------------
+# Desplegado completo de una página dinámica
 
-#iniciamos conexion al webdriver de selenium 
 
+option = webdriver.ChromeOptions() # Iniciación de la conexión con el navegador
+option.add_argument("--headless") # Opcion para que no aparezca el navegador
 
-option = webdriver.ChromeOptions()
-option.add_argument("--headless") #opcion para que no aparezca el navegador
-
-#Install Driver
+# Install Driver
 driver = webdriver.Chrome(ChromeDriverManager().install(), options = option)
 
 webBase = "https://www.museodelprado.es/coleccion/obras-de-arte"
@@ -160,22 +166,23 @@ driver.get(webBase)
 try:
     driver.find_element_by_tag_name('body').send_keys(Keys.END) # Función que permite llegar al final de la pagina web
     print("Fin pagina")
-    time.sleep(600) #necesitamos 2000 segundos hasta que la pagina llega al final
+    time.sleep(600) # Necesitamos 2000 segundos hasta que la pagina llega al final
     print("Fin time")
 except:
     print("error") 
 
-#obtenemos el archivo html para beautifulsoup
+# Obtenemos el archivo html para beautifulsoup
 body = driver.execute_script("return document.body")
 source = body.get_attribute('innerHTML')
 
 # Extraemos la estructura de la página base
 pagBaseStr = BeautifulSoup(source, "html.parser")
 driver.close()
-# Extraemos los links
 
+# Extraemos los links
 enlacesObras = getLinks(pagBaseStr)
 numMax = len(enlacesObras)
+
 #enlacesObras = getLinksMax(pagBaseStr,numMax)
 
 
@@ -212,8 +219,5 @@ for i, _array in enumerate(datosNP):
             fichaTec.append(element[1])
         datosDF.loc[len(datosDF.index)] = fichaTec
 #print(datosDF)
-datosDF.to_csv('mydataframe.csv', index=False, encoding="utf-8") #TODO al exportar el ; corta la línea
-
-
-#TODO hacer una lista con todos los links de descarga e incluirlos en una nueva columna "url" en el df
+datosDF.to_csv('mydataframe.csv', index=False, encoding="utf-8")
 
