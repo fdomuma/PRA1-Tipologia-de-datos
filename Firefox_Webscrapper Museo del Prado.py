@@ -193,6 +193,7 @@ source = body.get_attribute('innerHTML')
 # Extraemos la estructura de la página base
 pagBaseStr = BeautifulSoup(source, "html.parser")
 driver.close()
+driver.quit()
 
 # Extraemos los links
 enlacesObras = getLinks(pagBaseStr)
