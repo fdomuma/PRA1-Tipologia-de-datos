@@ -125,6 +125,7 @@ def scrollDown(driver, numObras):
     while numActObras < numObras:
         figures = driver.find_elements_by_tag_name('figure')
         driver.execute_script("arguments[0].scrollIntoView();", figures[-1])
+        numActObras = len(figures)
         time.sleep(1)
 
 #-------------------------------------------------------------------------------
