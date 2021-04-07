@@ -180,7 +180,7 @@ driver = webdriver.Firefox(options=option)
 webBase = "https://www.museodelprado.es/coleccion/obras-de-arte"
 driver.get(webBase)
 
-numObras = 10000
+numObras = 8000
 try:
     scrollDown(driver,numObras)
     print("Alcanzado Numero de Obras")
