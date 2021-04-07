@@ -123,10 +123,14 @@ def scrollDown(driver, numObras):
     """
     numActObras = 0 
     while numActObras < numObras:
-        figures = driver.find_elements_by_tag_name('figure')
-        driver.execute_script("arguments[0].scrollIntoView();", figures[-1])
-        numActObras = len(figures)
-        time.sleep(1)
+        try:
+            figures = driver.find_elements_by_tag_name('figure')
+            driver.execute_script("arguments[0].scrollIntoView();", figures[-1])
+            numActObras = len(figures)
+            time.sleep(1)
+        except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+            print(str(e))
+            pass
 
 #-------------------------------------------------------------------------------
 # Funciones para la descarga de imágenes
@@ -184,8 +188,9 @@ numObras = 8000
 try:
     scrollDown(driver,numObras)
     print("Alcanzado Numero de Obras")
-except:
-    print("error") 
+except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
+    print(str(e))
+    pass
 
 # Obtenemos el archivo html para beautifulsoup
 body = driver.execute_script("return document.body")
@@ -217,7 +222,7 @@ for link in enlacesObras:
         datos.append(tempData)
         inicio += 1
         time.sleep(0.5)
-    except Exception as e:
+    except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
         print(str(e))
         pass
 
