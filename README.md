@@ -13,5 +13,6 @@ En este repositorio podemos encontrar las siguientes carpetas y archivos:
   - **Webscrapper Museo del Prado.py**: este archivo Python consiste en el archivo que realiza todo el web scraping de esta práctica
   - **versiones Anteriores**: en esta carpeta podemos encontrar versiones alternativas desarrolladas, entre las cuales tenemos una versión desarrollada con hilos que permite una ejecución concurrente del web scraping y una versión desarrollada para hacer web scrpaing con el navegador Chrome. La versión que implementa Hilos ha sido finalmente descartada debido a la gran carga que supone al servidor.
 - **DOI** a los datos:
-- **Datos**: en esta carpeta encontramos el dataframe obtenido
-  - **nombreDF.csv**: CSV que contiene datos obtenidos con el desarrollo de esta práctica
+- **Datos**: en esta carpeta encontramos todos los datos obtenidos
+  - **fichasTecnicas_MuseoPrado.csv**: CSV que contiene datos obtenidos de las obras con el desarrollo de esta práctica
+  - **imgs**: carpeta que contiene las primeras 15 imagenes descargados de la página web del Museo del Prado
